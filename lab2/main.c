@@ -19,7 +19,7 @@ int main() {
         fprintf(stderr, "Error %s", dlerror());
         return 1;
     }
-    test_collatz_convergence = dlsym(dyn_lib, "test_collatz_convergence");
+    test_collatz_convergence = dlsym(dyn_lib, "test_collatz_convergencemkdir ");
 #endif
 
     for (int i=0; i<5; ++i) {
