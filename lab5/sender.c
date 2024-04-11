@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <catcher_pid> <work_mode>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+    signal(SIGUSR1, handler);
 
     catcher_pid = atoi(argv[1]);
     work_mode = atoi(argv[2]);
@@ -40,7 +41,6 @@ int main(int argc, char *argv[]) {
     sigqueue(catcher_pid, SIGUSR1, value);
 
 
-    signal(SIGUSR1, handler);
     while (success);
 
     printf("Confirmation received");
