@@ -1,6 +1,6 @@
-CFLAGS = -Wall -O0 -std=c17
-DEBUG_FLAGS = -g -std=c17 -Wall -O0
-CC = clang
+CFLAGS = -Wall -O0
+DEBUG_FLAGS = -g  -Wall -O0
+CC = gcc
 
 all: signal catcher sender
 

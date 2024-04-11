@@ -10,10 +10,13 @@
 
 #define MAX_WORK_MODE 3
 
+pid_t catcher_pid;
+int work_mode;
+int success = 1;
+
+
 void handler(int sig) {
-    if (sig == SIGUSR1) {
-        printf("Received confirmation from catcher\n");
-    }
+    success = 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -22,37 +25,25 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pid_t catcher_pid = atoi(argv[1]);
-    int work_mode = atoi(argv[2]);
+    catcher_pid = atoi(argv[1]);
+    work_mode = atoi(argv[2]);
 
-    if (work_mode < 1 || work_mode > MAX_WORK_MODE) {
-        fprintf(stderr, "Invalid work mode\n");
-        exit(EXIT_FAILURE);
-    }
+    struct sigaction act;
+    act.sa_handler = handler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    sigaction(SIGUSR1, &act, NULL);
 
-    struct sigaction sa;
-    sa.sa_handler = handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
 
     union sigval value;
     value.sival_int = work_mode;
-    if (sigqueue(catcher_pid, SIGUSR1, value) == -1) {
-        perror("sigqueue");
-        exit(EXIT_FAILURE);
-    }
+    sigqueue(catcher_pid, SIGUSR1, value);
 
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGUSR1);
-    while (1) {
-        sigsuspend(&mask);
-        break;
-    }
+
+    signal(SIGUSR1, handler);
+    while (success);
+
+    printf("Confirmation received");
 
     return 0;
 }

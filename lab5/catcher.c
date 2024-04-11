@@ -6,20 +6,32 @@
 
 #define EXIT_MODE 3
 
+int changed_work_mode = 0;
+int current_work_mode = -1;
+
 void handler(int sig, siginfo_t *info, void *context) {
     if (sig == SIGUSR1) {
         pid_t sender_pid = info->si_pid;
         union sigval val = info->si_value;
         int work_mode = val.sival_int;
-        sigqueue(sender_pid, SIGUSR1, value);
-        if (received_work_mode == EXIT_MODE) {
-            printf("Received mode 3. Exiting\n");
-            exit(0);
-        } else if (received_work_mode >= 1 && received_work_mode <= EXIT_MODE) {
-            work_mode = received_work_mode;
-        } else {
-            printf("Invalid work mode: %d\n", received_work_mode);
+        if (work_mode != current_work_mode) {
+            current_work_mode = work_mode;
+            changed_work_mode++;
         }
+        if (work_mode == EXIT_MODE) {
+            printf("Received mode 3. Exiting\n");
+            kill(sender_pid, SIGUSR1);
+            exit(0);
+        } else if (work_mode == 1) {
+            for (int i = 1; i <= 100; ++i) {
+                printf("%d\n", i);
+            }
+        } else if (work_mode == 2) {
+            printf("Changed work mode %d times\n", changed_work_mode);
+        } else {
+            printf("Invalid work mode: %d\n", work_mode);
+        }
+        kill(sender_pid, SIGUSR1);
     }
 }
 
