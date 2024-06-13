@@ -1,13 +1,10 @@
 CC = gcc
 CFLAGS = -Wall
 
-all: life mutex
+all: life santa
 	
-mutex: mutex.c
-	$(CC) $(CFLAGS) mutex.o -o mutex
-
-mutex.o: mutex.c
-	$(CC) $(CFLAGS) mutex.c -o $@
+santa: santa.c
+	$(CC) $(CFLAGS) santa.c -o santa -lpthread
 
 lab: lab.o
 	$(CC) $(CFLAGS) lab.o -o lab
@@ -16,4 +13,4 @@ lab.o: lab.c
 	$(CC) $(CFLAGS) -c lab.c -o $@
 
 clean:
-	rm -f life *.o *.exe *.dSYM lab mutex
+	rm -f life *.o *.exe *.dSYM lab mutex santa
